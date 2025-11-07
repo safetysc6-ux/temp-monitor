@@ -249,12 +249,12 @@
             let status = { text: "", class: "", borderClass: "", color: PRIMARY_COLOR }; 
 
             if (temp >= PRE_ALARM_THRESHOLD) { // T >= 60
-                status.text = "🚨 อันตราย: ปิดระบบฉุกเฉิน"; // Changed to Thai
+                status.text = "🚨 อันตราย: อุณหภูมิสูง"; // Changed to Thai
                 status.class = "bg-alarm shadow-alarm/50";
                 status.borderClass = "border-alarm";
                 status.color = ALARM_COLOR;
             } else if (temp >= NORMAL_THRESHOLD) { // 55 <= T < 60
-                status.text = "⚠️ แจ้งเตือนล่วงหน้า"; // Changed to Thai
+                status.text = "⚠️ อุณหภูมิเริ่มผิดปกติ"; // Changed to Thai
                 status.class = "bg-pre-alarm shadow-pre-alarm/50";
                 status.borderClass = "border-pre-alarm";
                 status.color = PRE_ALARM_COLOR;
@@ -437,6 +437,7 @@
     </script>
 </body>
 </html>
+
 
 
 
