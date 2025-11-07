@@ -27,7 +27,7 @@
             border: 3px solid rgba(255, 255, 255, 0.2); /* Clearer Border */
         }
         .temp-text {
-            font-size: 3.2rem;
+            font-size: 2.5rem; /* ปรับลดขนาดฟอนต์พื้นฐานสำหรับมือถือ (200px gauge) */
             font-weight: 800;
             text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); /* Digital text glow */
         }
@@ -43,6 +43,9 @@
                 width: 250px;
                 height: 250px;
                 line-height: 250px;
+            }
+            .temp-text {
+                font-size: 3.0rem; /* เพิ่มขนาดฟอนต์ให้พอดีกับวงกลม 250px บนเดสก์ท็อป */
             }
         }
     </style>
