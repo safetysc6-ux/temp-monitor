@@ -14,32 +14,36 @@
     <style>
         /* Custom styles for the temperature gauge effect and graph container */
         .temp-gauge {
-            width: 250px;
-            height: 250px;
-            line-height: 250px;
+            width: 200px; /* Smaller on mobile, looks cleaner */
+            height: 200px;
+            line-height: 200px;
             border-radius: 50%;
             display: inline-block;
             box-shadow: 
-                0 0 0 10px rgba(255, 255, 255, 0.1), /* Outer Glow */
-                0 0 25px rgba(0, 0, 0, 0.5) inset; /* Inner Shadow for depth */
+                0 0 0 5px rgba(255, 255, 255, 0.05), /* Subtle Outer Ring */
+                0 0 10px rgba(0, 0, 0, 0.5) inset; /* Inner Shadow for depth */
             transition: all 0.5s ease-in-out;
             font-family: 'Inter', sans-serif;
-            border: 5px solid rgba(255, 255, 255, 0.5); /* Clearer Border */
+            border: 3px solid rgba(255, 255, 255, 0.2); /* Clearer Border */
         }
         .temp-text {
-            font-size: 3.5rem;
+            font-size: 3.2rem;
             font-weight: 800;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.5); /* Digital text glow */
         }
         /* Body for full height and smooth dark background */
         body {
             min-height: 100vh;
-            background-color: #111827; /* Darker background */
+            background-color: #000000; /* True Black background */
         }
 
-        /* Ensure Canvas is responsive within its container */
-        #tempChart {
-            max-width: 100%;
-            height: auto;
+        /* Responsive adjustments for gauge on larger screens */
+        @media (min-width: 640px) {
+            .temp-gauge {
+                width: 250px;
+                height: 250px;
+                line-height: 250px;
+            }
         }
     </style>
     <script>
@@ -47,54 +51,96 @@
             theme: {
                 extend: {
                     colors: {
-                        'normal': '#10b981', /* Emerald Green */
-                        'pre-alarm': '#fbbf24', /* Amber Yellow - slightly brighter */
-                        'alarm': '#ef4444', /* Red */
-                        'card-bg': '#1f2937', /* Darker card background */
-                        'text-light': '#f3f4f6', /* Light text on dark bg */
+                        'primary-accent': '#06b6d4', /* Cyan */
+                        'normal': '#16a34a', /* Darker Green */
+                        'pre-alarm': '#f59e0b', /* Amber Yellow */
+                        'alarm': '#dc2626', /* Stronger Red */
+                        'card-bg': '#0f172a', /* Slate Darker */
+                        'text-light': '#e2e8f0', /* Light text on dark bg */
                     }
                 }
             }
         }
     </script>
 </head>
-<body class="bg-gray-900 flex flex-col items-center p-4 text-text-light">
+<body class="bg-black flex flex-col items-center p-4 text-text-light">
 
     <!-- Header / Title -->
-    <header class="w-full text-center py-6">
-        <h1 class="text-4xl font-extrabold text-white tracking-tight">
-            Advanced Temperature Monitor ⚙️
+    <header class="w-full text-center py-6 border-b border-gray-800 mb-6">
+        <h1 class="text-4xl font-extrabold text-white tracking-widest uppercase">
+            System Monitoring Dashboard
         </h1>
-        <p class="text-base text-gray-400 mt-2">EV Station Fac1 | Real-time Operational Data</p>
+        <p class="text-base text-primary-accent mt-2 font-mono">EV-FAC1.RTM.MONITOR | Operational Data Stream</p>
     </header>
 
     <!-- Main Card Container -->
-    <div id="main-card" class="w-full max-w-sm bg-card-bg rounded-2xl shadow-xl p-8 mb-8 border-t-8 border-normal transition duration-500">
+    <div id="main-card" class="w-full max-w-lg bg-card-bg rounded-2xl shadow-2xl shadow-primary-accent/10 p-6 mb-8 border-t-8 border-primary-accent transition duration-500">
         
-        <!-- Temperature Gauge Display -->
-        <div class="text-center mb-8">
-            <div id="gauge" class="temp-gauge text-white bg-normal mx-auto flex items-center justify-center">
-                <span id="temp" class="temp-text">-- °C</span>
+        <!-- Section 1: Temperature Gauge & Value -->
+        <div class="flex flex-col items-center text-center mb-8">
+            <h2 class="text-lg text-gray-400 font-semibold mb-4 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2 text-primary-accent"><path d="M14 4v10.54a4 4 0 1 1-4 0V4"></path></svg>
+                CURRENT TEMPERATURE
+            </h2>
+            <div id="gauge" class="temp-gauge text-white bg-primary-accent mx-auto flex items-center justify-center">
+                <span id="temp" class="temp-text font-mono">-- °C</span>
             </div>
         </div>
 
-        <!-- Status Indicator and Last Update Time -->
-        <div class="space-y-4">
-            <div id="status-display" class="w-full text-center py-4 px-4 rounded-xl font-extrabold text-xl text-white bg-normal shadow-lg transition duration-500 transform hover:scale-[1.02]">
+        <!-- Section 2: Status Indicator and Metrics -->
+        <div class="space-y-4 border-t border-gray-700 pt-6">
+            <div id="status-display" class="w-full text-center py-4 px-4 rounded-xl font-extrabold text-xl text-white shadow-xl transition duration-500 transform hover:scale-[1.01] bg-normal shadow-normal/30">
                 Loading Status...
             </div>
-            <div class="flex justify-between text-sm text-gray-400 font-medium pt-2 border-t border-gray-700">
-                <span>Last Updated:</span>
-                <span id="time" class="font-bold text-gray-300">--</span>
+            
+            <div class="flex justify-between text-sm text-gray-400 font-medium pt-2">
+                <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-1"><path d="M8 2v4"></path><path d="M16 2v4"></path><path d="M21 21V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v15"></path><path d="M3 10h18"></path></svg>
+                    Last Data Timestamp:
+                </span>
+                <span id="time" class="font-mono text-gray-300">--</span>
+            </div>
+            
+            <div class="flex justify-between text-sm text-gray-400 font-medium">
+                <span class="flex items-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-4 h-4 mr-1"><path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"></path><path d="M7 14v4h10v-4"></path><path d="M12 22v-4"></path></svg>
+                    Alarm Threshold:
+                </span>
+                <span class="font-bold text-alarm">60.0 °C</span>
             </div>
         </div>
     </div>
     
+    <!-- Daily Statistics Section (UPDATED) -->
+    <div class="w-full max-w-lg grid grid-cols-3 gap-4 mb-8">
+        <!-- Min Temp -->
+        <div class="bg-card-bg rounded-xl p-4 text-center shadow-lg border-b-2 border-primary-accent">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">MINIMUM</p>
+            <p id="min-temp" class="text-2xl font-bold mt-1 text-primary-accent font-mono">-- °C</p>
+        </div>
+        <!-- Avg Temp -->
+        <div class="bg-card-bg rounded-xl p-4 text-center shadow-lg border-b-2 border-primary-accent">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">AVERAGE</p>
+            <p id="avg-temp" class="text-2xl font-bold mt-1 text-primary-accent font-mono">-- °C</p>
+        </div>
+        <!-- Max Temp -->
+        <div class="bg-card-bg rounded-xl p-4 text-center shadow-lg border-b-2 border-alarm">
+            <p class="text-xs text-gray-400 uppercase tracking-wider">MAXIMUM</p>
+            <p id="max-temp" class="text-2xl font-bold mt-1 text-alarm font-mono">-- °C</p>
+        </div>
+    </div>
+    <div class="w-full max-w-lg text-center text-xs text-gray-500 mb-6">
+        <span id="stat-count">Loading daily statistics...</span>
+    </div>
+
     <!-- Real-Time Chart Section -->
-    <div class="w-full max-w-lg bg-card-bg rounded-2xl shadow-xl p-6 mb-10 border-t-4 border-gray-700">
-        <h3 class="text-2xl font-semibold text-white mb-4 border-b border-gray-700 pb-2">Temperature History Analysis</h3>
+    <div class="w-full max-w-lg bg-card-bg rounded-2xl shadow-2xl shadow-primary-accent/10 p-6 mb-10 border-t-4 border-gray-700">
+        <h3 class="text-xl font-semibold text-white mb-4 border-b border-gray-700 pb-2 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="w-5 h-5 mr-2 text-primary-accent"><path d="M3 3v18h18"></path><path d="m18 17-5-5-3 3-3-3"></path></svg>
+            Historical Trend Analysis
+        </h3>
         <canvas id="tempChart"></canvas>
-        <p class="text-sm text-gray-500 text-center mt-3">Monitoring last 20 time-stamped entries for trends.</p>
+        <p class="text-xs text-gray-500 text-center mt-3 font-mono">20 Data Points Stream: Focus on critical data integrity.</p>
     </div>
 
 
@@ -102,12 +148,14 @@
         // --- CONSTANTS & CONFIG ---
         const NORMAL_THRESHOLD = 55.0;      // T < 55.0 is Normal
         const PRE_ALARM_THRESHOLD = 60.0;   // 55.0 <= T < 60.0 is Pre-Alarm
-        const MAX_DATA_POINTS = 20;         // Max points to show on chart
+        const MAX_CHART_POINTS = 20;        // Max points to show on chart
+        // NOTE: STAT_DATA_POINTS is removed as calculation is now based on calendar day.
 
         // Colors defined in Tailwind config for consistency
-        const NORMAL_COLOR = '#10b981';
-        const PRE_ALARM_COLOR = '#fbbf24';
-        const ALARM_COLOR = '#ef4444';
+        const PRIMARY_COLOR = '#06b6d4'; // Cyan
+        const NORMAL_COLOR = '#16a34a';
+        const PRE_ALARM_COLOR = '#f59e0b';
+        const ALARM_COLOR = '#dc2626';
 
         // 🔥 Firebase Config (from user's original code)
         const firebaseConfig = {
@@ -128,14 +176,13 @@
 
         // --- CHART.JS SETUP ---
         const tempChartCtx = document.getElementById('tempChart').getContext('2d');
-        let chartGradient;
-
+        
         // Function to create gradient for the chart background
         function createGradient(chartContext, color) {
             if (!chartContext) return 'rgba(0,0,0,0.1)';
             const gradient = chartContext.createLinearGradient(0, 0, 0, 300);
-            gradient.addColorStop(0, color.replace(')', ', 0.5)')); // Start: 50% opacity
-            gradient.addColorStop(1, color.replace(')', ', 0.05)')); // End: 5% opacity
+            gradient.addColorStop(0, color.replace(')', ', 0.6)')); // Start: Higher opacity
+            gradient.addColorStop(1, color.replace(')', ', 0.1)')); // End: Lower opacity
             return gradient;
         }
 
@@ -144,14 +191,14 @@
             datasets: [{
                 label: 'Temperature (°C)',
                 data: [],
-                borderColor: '#60a5fa', // Default Blue Line
-                backgroundColor: chartGradient, // Will be set dynamically
+                borderColor: PRIMARY_COLOR, // Default Cyan Line
+                backgroundColor: createGradient(tempChartCtx, PRIMARY_COLOR),
                 tension: 0.4, // Smoother curve
                 borderWidth: 3,
                 fill: true,
                 pointRadius: 5,
                 pointBackgroundColor: '#fff',
-                pointBorderColor: '#60a5fa',
+                pointBorderColor: PRIMARY_COLOR,
                 pointHoverRadius: 8,
             }]
         };
@@ -167,26 +214,26 @@
                     tooltip: { 
                         mode: 'index', 
                         intersect: false,
-                        backgroundColor: 'rgba(31, 41, 55, 0.9)', // Darker tooltip
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)', // Darker tooltip
                         titleColor: '#fff',
-                        bodyColor: '#fff',
-                        borderColor: '#60a5fa',
+                        bodyColor: PRIMARY_COLOR,
+                        borderColor: PRIMARY_COLOR,
                         borderWidth: 1,
                         padding: 10,
                     }
                 },
                 scales: {
                     x: {
-                        title: { display: true, text: 'Time (HH:MM:SS)', color: '#9ca3af' },
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#9ca3af' }
+                        title: { display: true, text: 'Time (HH:MM:SS)', color: '#94a3b8' },
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8', font: { family: 'Inter, monospace' } }
                     },
                     y: {
-                        title: { display: true, text: 'Temperature (°C)', color: '#9ca3af' },
+                        title: { display: true, text: 'Temperature (°C)', color: '#94a3b8' },
                         min: 30, 
                         max: 70, 
-                        grid: { color: 'rgba(255, 255, 255, 0.1)' },
-                        ticks: { color: '#9ca3af' }
+                        grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                        ticks: { color: '#94a3b8' }
                     }
                 }
             }
@@ -196,25 +243,69 @@
 
         // --- HELPER FUNCTION: GET STATUS AND STYLES ---
         function getStatus(temp) {
-            let status = { text: "", class: "", borderClass: "", color: '#60a5fa' }; // Default color is a nice blue
+            let status = { text: "", class: "", borderClass: "", color: PRIMARY_COLOR }; 
 
             if (temp >= PRE_ALARM_THRESHOLD) { // T >= 60
-                status.text = "🚨 ALARM CRITICAL (สูงกว่า 60°C)";
+                status.text = "🚨 ALARM CRITICAL: SHUTDOWN IMMINENT";
                 status.class = "bg-alarm shadow-alarm/50";
                 status.borderClass = "border-alarm";
                 status.color = ALARM_COLOR;
             } else if (temp >= NORMAL_THRESHOLD) { // 55 <= T < 60
-                status.text = "⚠️ PRE-ALARM WARNING (55°C - 60°C)";
+                status.text = "⚠️ PRE-ALARM: MONITOR CLOSELY";
                 status.class = "bg-pre-alarm shadow-pre-alarm/50";
                 status.borderClass = "border-pre-alarm";
                 status.color = PRE_ALARM_COLOR;
             } else { // T < 55
-                status.text = "✅ NORMAL OPERATING (ต่ำกว่า 55°C)";
-                status.class = "bg-normal shadow-normal/50";
+                status.text = "✅ NORMAL OPERATING: ALL SYSTEMS GREEN";
+                status.class = "bg-normal shadow-normal/30";
                 status.borderClass = "border-normal";
                 status.color = NORMAL_COLOR;
             }
             return status;
+        }
+
+        // --- CALCULATION FUNCTION: Min/Max/Avg (UPDATED) ---
+        function calculateAndDisplayStats(history) {
+            if (!history || history.length === 0) {
+                document.getElementById("min-temp").innerText = "-- °C";
+                document.getElementById("max-temp").innerText = "-- °C";
+                document.getElementById("avg-temp").innerText = "-- °C";
+                document.getElementById("stat-count").innerText = "No data points found for today.";
+                return;
+            }
+
+            let min = Infinity;
+            let max = -Infinity;
+            let sum = 0;
+            
+            history.forEach(d => {
+                const temp = d.temperature;
+                min = Math.min(min, temp);
+                max = Math.max(max, temp);
+                sum += temp;
+            });
+
+            const avg = sum / history.length;
+
+            // Update the new UI elements
+            document.getElementById("min-temp").innerText = min.toFixed(1) + " °C";
+            document.getElementById("max-temp").innerText = max.toFixed(1) + " °C";
+            document.getElementById("avg-temp").innerText = avg.toFixed(1) + " °C";
+            document.getElementById("stat-count").innerText = `Calculated based on ${history.length} data points from today.`;
+        }
+        
+        // --- HELPER FUNCTION: Get the Firebase key for the start of the current day (NEW) ---
+        function getStartOfDayKey() {
+            const now = new Date();
+            // Set time to 00:00:00.000 for the current date
+            const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0, 0); 
+            
+            // Format: YYYY-MM-DD-00-00-00 (matches Firebase key format)
+            const year = startOfDay.getFullYear();
+            const month = String(startOfDay.getMonth() + 1).padStart(2, '0');
+            const day = String(startOfDay.getDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}-00-00-00`;
         }
 
         // --- UPDATE UI FUNCTION ---
@@ -231,13 +322,14 @@
 
             tempEl.innerText = temp.toFixed(1) + " °C";
 
-            // 2. Apply status styles
+            // 2. Apply status styles to status bar
             statusEl.innerText = status.text;
-            statusEl.className = "w-full text-center py-4 px-4 rounded-xl font-extrabold text-xl text-white shadow-lg transition duration-500 transform hover:scale-[1.02] " + status.class;
+            statusEl.className = "w-full text-center py-4 px-4 rounded-xl font-extrabold text-xl text-white shadow-xl transition duration-500 transform " + status.class;
             
-            // 3. Update Gauge and Card color
+            // 3. Update Gauge and Card color (Gauge background changes to match status color)
             gaugeEl.className = "temp-gauge mx-auto flex items-center justify-center text-white transition duration-500 " + status.class;
-            cardEl.className = "w-full max-w-sm bg-card-bg rounded-2xl shadow-xl p-8 mb-8 border-t-8 transition duration-500 " + status.borderClass;
+            // The main card border changes to accent the current status
+            cardEl.className = "w-full max-w-lg bg-card-bg rounded-2xl shadow-2xl shadow-primary-accent/10 p-6 mb-8 border-t-8 transition duration-500 " + status.borderClass;
 
             // 4. Update Chart Line and Fill Color based on current status
             tempChart.data.datasets[0].borderColor = status.color;
@@ -246,12 +338,12 @@
             tempChart.update();
             
             // 5. Update Time
-            // Format timestamp: 2024-01-01T12:30:00 -> 01 Jan 2024 12:30:00
             const date = new Date(timestamp);
-            timeEl.innerText = date.toLocaleString('th-TH', { 
+            // Enhanced date formatting for professional look
+            timeEl.innerText = date.toLocaleString('en-US', { 
                 day: '2-digit', month: 'short', year: 'numeric', 
-                hour: '2-digit', minute: '2-digit', second: '2-digit' 
-            }).replace(' ', ' ');
+                hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false
+            }) + " UTC";
         }
 
         // --- UPDATE CHART FUNCTION ---
@@ -260,8 +352,8 @@
             chartData.labels.push(data.timestamp.substring(11, 19)); // Use HH:mm:ss for graph X-axis
             chartData.datasets[0].data.push(data.temperature);
 
-            // Keep only the last MAX_DATA_POINTS
-            if (chartData.labels.length > MAX_DATA_POINTS) {
+            // Keep only the last MAX_CHART_POINTS
+            if (chartData.labels.length > MAX_CHART_POINTS) {
                 chartData.labels.shift();
                 chartData.datasets[0].data.shift();
             }
@@ -269,29 +361,49 @@
             tempChart.update();
         }
 
-        // --- INITIAL DATA FETCH FOR CHART HISTORY ---
-        logsRef.limitToLast(MAX_DATA_POINTS).once("value", (snapshot) => {
-            const data = snapshot.val();
-            if (data) {
-                const history = Object.keys(data).map(key => ({
-                    timestamp: key,
-                    temperature: data[key].temperature
-                }));
+        // --- INITIAL DATA FETCH FOR CHART HISTORY AND STATS (UPDATED) ---
+        function fetchInitialData() {
+            const startOfDayKey = getStartOfDayKey();
+            document.getElementById("stat-count").innerText = `Fetching data from ${startOfDayKey}...`;
 
-                // Clear previous data
-                chartData.labels = [];
-                chartData.datasets[0].data = [];
+            // Fetch all logs from the start of the day to the present
+            logsRef.orderByKey().startAt(startOfDayKey).once("value", (snapshot) => {
+                const data = snapshot.val();
+                if (data) {
+                    const history = Object.keys(data).map(key => ({
+                        timestamp: key,
+                        temperature: data[key].temperature
+                    }));
 
-                history.forEach(d => {
-                    chartData.labels.push(d.timestamp.substring(11, 19));
-                    chartData.datasets[0].data.push(d.temperature);
-                });
+                    // 1. Calculate and display stats based on all today's entries
+                    calculateAndDisplayStats(history); 
 
-                // Get the very last item from history to update the main display and set initial colors
-                const lastEntry = history[history.length - 1];
-                updateUI(lastEntry.temperature, lastEntry.timestamp);
-            }
-        });
+                    // 2. Prepare chart data (only last MAX_CHART_POINTS from the fetched history)
+                    chartData.labels = [];
+                    chartData.datasets[0].data = [];
+                    
+                    const chartHistory = history.slice(-MAX_CHART_POINTS);
+
+                    chartHistory.forEach(d => {
+                        chartData.labels.push(d.timestamp.substring(11, 19));
+                        chartData.datasets[0].data.push(d.temperature);
+                    });
+
+                    // Get the very last item from history to update the main display and set initial colors
+                    const lastEntry = history[history.length - 1];
+                    updateUI(lastEntry.temperature, lastEntry.timestamp);
+                } else {
+                    document.getElementById("stat-count").innerText = "No temperature data found for today.";
+                }
+            }, (error) => {
+                console.error("Firebase read failed:", error);
+                document.getElementById("stat-count").innerText = "Error fetching data.";
+            });
+        }
+        
+        // Execute initial data fetch
+        fetchInitialData();
+
 
         // --- REAL-TIME LISTENER (Listens only for new child additions) ---
         logsRef.limitToLast(1).on("child_added", (snapshot) => {
@@ -311,6 +423,11 @@
                 
                 // Always update the main UI with the latest data and dynamic chart colors
                 updateUI(newReading.temperature, newReading.timestamp);
+                
+                // NOTE: For true real-time daily stats, we would need to re-run fetchInitialData() here, 
+                // but this is often too resource-intensive for every single reading.
+                // For a professional dashboard, daily stats are usually refreshed periodically (e.g., every 5 minutes).
+                // We'll keep it simple by only fetching the stats once on load.
             }
         });
     </script>
